@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roadmap Tracker</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      background: #fff;
+      color: #1a1a1a;
+      padding: 1.5rem
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0
+    }
+
+    .wrap {
+      max-width: 780px;
+      margin: 0 auto
+    }
+
+    h1 {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: .25rem;
+      color: #1a1a1a
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 1.25rem
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 1.25rem
+    }
+
+    .metric {
+      background: #f5f5f3;
+      border-radius: 8px;
+      padding: .875rem 1rem
+    }
+
+    .metric-label {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 4px
+    }
+
+    .metric-value {
+      font-size: 22px;
+      font-weight: 500;
+      color: #1a1a1a
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1rem;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    .filter-btn {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 0.5px solid #ccc;
+      background: transparent;
+      color: #888;
+      cursor: pointer
+    }
+
+    .filter-btn.active {
+      background: #f0f0ee;
+      color: #1a1a1a;
+      border-color: #999
+    }
+
+    .save-status {
+      font-size: 12px;
+      color: #aaa;
+      margin-left: auto
+    }
+
+    .week-block {
+      margin-bottom: .875rem;
+      border: 0.5px solid #e0e0e0;
+      border-radius: 12px;
+      overflow: hidden
+    }
+
+    .week-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: #f5f5f3;
+      cursor: pointer;
+      user-select: none
+    }
+
+    .week-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: #1a1a1a;
+      flex: 1
+    }
+
+    .week-dates {
+      font-size: 11px;
+      color: #aaa
+    }
+
+    .week-pct {
+      font-size: 11px;
+      font-weight: 500;
+      color: #888;
+      min-width: 28px;
+      text-align: right
+    }
+
+    .chevron {
+      font-size: 10px;
+      color: #aaa;
+      transition: transform .2s
+    }
+
+    .chevron.open {
+      transform: rotate(180deg)
+    }
+
+    .prog-bar {
+      height: 2px;
+      background: #e8e8e8
+    }
+
+    .prog-fill {
+      height: 100%;
+      background: #1D9E75;
+      transition: width .3s
+    }
+
+    .days-wrap {
+      display: none;
+      padding: 10px 12px;
+      gap: 6px;
+      flex-direction: column
+    }
+
+    .days-wrap.open {
+      display: flex
+    }
+
+    .day-card {
+      border: 0.5px solid #e8e8e8;
+      border-radius: 8px;
+      overflow: hidden
+    }
+
+    .day-card.all-done {
+      border-color: transparent;
+      background: #f5f5f3
+    }
+
+    .day-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      cursor: pointer;
+      background: transparent
+    }
+
+    .day-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #888;
+      min-width: 52px
+    }
+
+    .day-summary {
+      font-size: 12px;
+      color: #aaa;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .day-count {
+      font-size: 11px;
+      color: #aaa
+    }
+
+    .day-tasks {
+      display: none;
+      padding: 6px 10px 8px;
+      gap: 5px;
+      flex-direction: column;
+      border-top: 0.5px solid #e8e8e8
+    }
+
+    .day-tasks.open {
+      display: flex
+    }
+
+    .task-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      cursor: pointer
+    }
+
+    .task-row input[type=checkbox] {
+      margin-top: 2px;
+      accent-color: #1D9E75;
+      cursor: pointer;
+      flex-shrink: 0
+    }
+
+    .task-text {
+      font-size: 12px;
+      color: #1a1a1a;
+      line-height: 1.5
+    }
+
+    .task-text.done {
+      color: #bbb;
+      text-decoration: line-through
+    }
+
+    .tag {
+      font-size: 10px;
+      font-weight: 500;
+      padding: 1px 5px;
+      border-radius: 3px;
+      display: inline-block;
+      margin-right: 4px;
+      vertical-align: middle
+    }
+
+    .t-fs {
+      background: #E6F1FB;
+      color: #0C447C
+    }
+
+    .t-ag {
+      background: #E1F5EE;
+      color: #085041
+    }
+
+    .t-prep {
+      background: #FAEEDA;
+      color: #633806
+    }
+
+    .milestone {
+      font-size: 11px;
+      color: #085041;
+      background: #E1F5EE;
+      padding: 5px 8px;
+      border-radius: 8px;
+      margin-top: 4px
+    }
+
+    .weekend {
+      font-size: 12px;
+      color: #bbb;
+      padding: 5px 10px;
+      font-style: italic
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <h2 class="sr-only">8-week fullstack and agents coding roadmap — interactive progress tracker with 108 tasks</h2>
+    <h1>Roadmap progress tracker</h1>
+    <p class="subtitle">8 weeks + prep day &nbsp;·&nbsp; Mon–Fri &nbsp;·&nbsp; 5h/day &nbsp;·&nbsp; Fri 17 Apr – Fri 12
+      Jun 2026</p>
+
+    <div class="summary">
+      <div class="metric">
+        <div class="metric-label">Days done</div>
+        <div class="metric-value" id="m-days">0/41</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Milestones</div>
+        <div class="metric-value" id="m-miles">0/8</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Tasks</div>
+        <div class="metric-value" id="m-tasks">0/108</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Progress</div>
+        <div class="metric-value" id="m-pct">0%</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="filter-btn active" data-f="all">All</button>
+      <button class="filter-btn" data-f="fs">FS only</button>
+      <button class="filter-btn" data-f="ag">AG only</button>
+      <button class="filter-btn" data-f="todo">Remaining</button>
+      <span class="save-status" id="save-status">Loading...</span>
+    </div>
+
+    <div id="weeks-root"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    const SUPABASE_URL = 'https://ffgsetxqsiforszssfra.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_aNoSQI7gy2dxYr5eqLV2gw_YXL5lEVJ';
+
+    let sb = null;
+
+    async function initSupabase() {
+      const { createClient } = supabase;
+      sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+
+    const WEEKS = [
+      {
+        title: 'Prep day', dates: 'Fri 17 Apr', miles: null, days: [
+          {
+            label: 'Fri 17', tasks: [
+              { tag: 'prep', text: 'Set up dev environment: nvm (Node 20+), Python 3.12, uv, git' },
+              { tag: 'prep', text: 'Read "Building effective agents" — the most important doc on the roadmap' },
+              { tag: 'prep', text: 'Get Anthropic API key + $10 credit; run hello-world curl or Python snippet' },
+              { tag: 'prep', text: 'Skim javascript.info table of contents — note unfamiliar vs familiar from C/Python' },
+              { tag: 'prep', text: 'Create GitHub repo roadmap-work; commit an empty README' },
+            ]
+          },
+        ]
+      },
+      {
+        title: 'Week 1 — Foundations', dates: 'Mon 20 – Fri 24 Apr', miles: 'First API call working; JS Promises comfortable', days: [
+          {
+            label: 'Mon 20', tasks: [
+              { tag: 'fs', text: 'JS closures & lexical scope (javascript.info ch.6) — closures like C function pointers capturing a stack frame' },
+              { tag: 'ag', text: 'Install anthropic Python SDK; build CLI that prints response + token usage' },
+            ]
+          },
+          {
+            label: 'Tue 21', tasks: [
+              { tag: 'fs', text: 'JS `this`, prototypes, classes — map to Python\'s `self` and C++ vtables' },
+              { tag: 'ag', text: 'Read prompt engineering overview; build multi-turn chat CLI with message history' },
+            ]
+          },
+          {
+            label: 'Wed 22', tasks: [
+              { tag: 'fs', text: 'Promises, async/await, event loop — closest C analogue: non-blocking I/O with callbacks' },
+              { tag: 'ag', text: 'Read CoT + XML tags + system prompts; write 5 progressive prompts for one task' },
+            ]
+          },
+          {
+            label: 'Thu 23', tasks: [
+              { tag: 'fs', text: 'Destructuring, spread, array methods, Map/Set, ES modules' },
+              { tag: 'ag', text: 'Read tool use docs; sketch the agent loop on paper' },
+            ]
+          },
+          {
+            label: 'Fri 24', tasks: [
+              { tag: 'fs', text: 'Node + npm project setup; rewrite Wed fetch script as proper npm project' },
+              { tag: 'ag', text: 'Implement read_file / write_file / list_dir tools (single-turn, no loop yet)' },
+            ]
+          },
+          { label: 'Weekend', weekend: true, tasks: [] },
+        ]
+      },
+      {
+        title: 'Week 2 — React + Agent Loop', dates: 'Mon 27 Apr – Fri 1 May', miles: 'Todo app works; hand-rolled agent loop runs on real tasks', days: [
+          {
+            label: 'Mon 27', tasks: [
+              { tag: 'fs', text: 'React: components, JSX, props, useState — components as C structs with render functions' },
+              { tag: 'ag', text: 'Implement the full agent loop — iterate until end_turn' },
+            ]
+          },
+          {
+            label: 'Tue 28', tasks: [
+              { tag: 'fs', text: 'useEffect, events, lists, conditional rendering' },
+              { tag: 'ag', text: 'Test agent on "add docstrings to utils.py"; fix what breaks — this is v0' },
+            ]
+          },
+          {
+            label: 'Wed 29', tasks: [
+              { tag: 'fs', text: 'Build todo app in React + Vite (plain JS) — add, delete, toggle, filter' },
+              { tag: 'ag', text: 'Add run_bash (whitelisted, timeout via subprocess); read "Building effective agents" pass 1' },
+            ]
+          },
+          {
+            label: 'Thu 30', tasks: [
+              { tag: 'fs', text: 'Finish todo app; split into multiple components' },
+              { tag: 'ag', text: 'Add grep/find tool; sandbox agent to ./workspace' },
+            ]
+          },
+          {
+            label: 'Fri 1', tasks: [
+              { tag: 'fs', text: 'Review React rendering; add one more todo feature' },
+              { tag: 'ag', text: 'Structured logging with rich; test agent on a messy Python file' },
+            ]
+          },
+          { label: 'Weekend', weekend: true, tasks: [] },
+        ]
+      },
+      {
+        title: 'Week 3 — TypeScript + Proper Agent', dates: 'Mon 4 – Fri 8 May', miles: 'Typed todo app; proper coding agent with 5–7 tools', days: [
+          {
+            label: 'Mon 4', tasks: [
+              { tag: 'fs', text: 'TS basics, everyday types, narrowing; set up project with strict: true' },
+              { tag: 'ag', text: 'Read prompt caching docs; add caching to system prompt + tool definitions' },
+            ]
+          },
+          {
+            label: 'Tue 5', tasks: [
+              { tag: 'fs', text: 'TS functions, object types; Matt Pocock beginner tutorial' },
+              { tag: 'ag', text: 'Measure cost before/after caching on a 20-turn run; write down the savings' },
+            ]
+          },
+          {
+            label: 'Wed 6', tasks: [
+              { tag: 'fs', text: 'TS generics, keyof, Partial/Pick/Omit/Record utility types' },
+              { tag: 'ag', text: 'Re-read "Building effective agents"; start refactoring agent' },
+            ]
+          },
+          {
+            label: 'Thu 7', tasks: [
+              { tag: 'fs', text: 'Discriminated unions, type guards, as const, satisfies' },
+              { tag: 'ag', text: 'Finish proper agent — clean prompt, 5–7 tools, sandboxed, logged' },
+            ]
+          },
+          {
+            label: 'Fri 8', tasks: [
+              { tag: 'fs', text: 'Rewrite todo app in TypeScript; type props, events, state' },
+              { tag: 'ag', text: 'Test agent on 3 coding tasks; note failures (these become eval cases)' },
+            ]
+          },
+          { label: 'Weekend', weekend: true, tasks: [] },
+        ]
+      },
+      {
+        title: 'Week 4 — Next.js + Agent SDK', dates: 'Mon 11 – Fri 15 May', miles: 'Notes app in Next.js + Postgres; Agent SDK + MCP both working', days: [
+          {
+            label: 'Mon 11', tasks: [
+              { tag: 'fs', text: 'Next.js learn course — App Router, file conventions (page.tsx, layout.tsx)' },
+              { tag: 'ag', text: 'Agent SDK overview + quickstart; install claude-agent-sdk; run bug-fix quickstart' },
+            ]
+          },
+          {
+            label: 'Tue 12', tasks: [
+              { tag: 'fs', text: 'Server vs Client Components ("use client") — the main new mental model; take your time' },
+              { tag: 'ag', text: 'Compare hand-rolled vs SDK; note what the SDK gives you for free' },
+            ]
+          },
+          {
+            label: 'Wed 13', tasks: [
+              { tag: 'fs', text: 'Route handlers, Server Actions, data fetching, dynamic routes' },
+              { tag: 'ag', text: 'Read permissions guide; build read-only code reviewer (Read/Glob/Grep only)' },
+            ]
+          },
+          {
+            label: 'Thu 14', tasks: [
+              { tag: 'fs', text: 'SQL + Postgres review; Neon free tier; Drizzle setup' },
+              { tag: 'ag', text: 'MCP intro; install mcp SDK; start a simple MCP server' },
+            ]
+          },
+          {
+            label: 'Fri 15', tasks: [
+              { tag: 'fs', text: 'Build notes CRUD in Next.js — Server Components reads, Server Actions writes, Drizzle + Neon' },
+              { tag: 'ag', text: 'Finish MCP server with search_my_notes + summarize_commit; wire into agent' },
+            ]
+          },
+          { label: 'Weekend', weekend: true, tasks: [] },
+        ]
+      },
+      {
+        title: 'Week 5 — Production Essentials', dates: 'Mon 18 – Fri 22 May', miles: "Auth'd notes app; eval harness with 25 cases + traces; all 5 workflow patterns built", days: [
+          {
+            label: 'Mon 18', tasks: [
+              { tag: 'fs', text: 'Tailwind docs; install shadcn/ui' },
+              { tag: 'ag', text: 'Read Anthropic eval guidance; design YAML test-case format' },
+            ]
+          },
+          {
+            label: 'Tue 19', tasks: [
+              { tag: 'fs', text: 'Restyle notes app with Tailwind + shadcn — responsive, dark mode' },
+              { tag: 'ag', text: 'Build eval harness; 10 test cases running with pass/fail/cost report' },
+            ]
+          },
+          {
+            label: 'Wed 20', tasks: [
+              { tag: 'fs', text: 'Auth.js — sessions, OAuth, password hashing; add signup/login to notes app' },
+              { tag: 'ag', text: 'Tracing with JSONL + pretty-printer; instrument agent so any run is replayable' },
+            ]
+          },
+          {
+            label: 'Thu 21', tasks: [
+              { tag: 'fs', text: 'Finish auth — users see only own notes; protect server actions + API routes' },
+              { tag: 'ag', text: 'Grow evals to 25 cases; fix top 2 failure modes' },
+            ]
+          },
+          {
+            label: 'Fri 22', tasks: [
+              { tag: 'fs', text: 'Next.js caching basics; useOptimistic for note CRUD' },
+              { tag: 'ag', text: 'Read "Workflows" section of Building effective agents in full before coding' },
+              { tag: 'ag', text: 'Pattern 1 — Prompt chaining: extract → generate docstrings → verify (compare to single-shot)' },
+              { tag: 'ag', text: 'Pattern 2 — Parallelisation: fan out docstring generation for 10 fns with asyncio.gather; implement 3-way majority vote' },
+              { tag: 'ag', text: 'Pattern 3 — Routing: classify input (security/performance/style/correctness) then dispatch to specialist prompt' },
+              { tag: 'ag', text: 'Pattern 4 — Orchestrator-workers: small version — orchestrator plans "refactor this module", workers execute' },
+              { tag: 'ag', text: 'Pattern 5 — Evaluator-optimizer: generate test suite → score it → regenerate if below threshold (cap 3 iterations)' },
+              { tag: 'ag', text: 'Write a one-paragraph personal decision guide: which pattern, when' },
+            ]
+          },
+          { label: 'Weekend', weekend: true, tasks: [] },
+        ]
+      },
+      {
+        title: 'Week 6 — Start Your Project', dates: 'Mon 25 – Fri 29 May', miles: 'Project deployed (rough); first agent endpoint end-to-end', days: [
+          {
+            label: 'Mon 25', tasks: [
+              { tag: 'fs', text: 'Scaffold Next.js + Drizzle + Neon; define schema; initial migrations' },
+              { tag: 'ag', text: 'Plan agent feature — tools, success criteria, 5 eval cases' },
+            ]
+          },
+          {
+            label: 'Tue 26', tasks: [
+              { tag: 'fs', text: 'Auth flow, base layout, shadcn components' },
+              { tag: 'ag', text: 'Port orchestrator-workers from Day 25 into project context (real tools, real data)' },
+              { tag: 'ag', text: 'Decide: does your agent need a routing step? Add one if users can ask qualitatively different things' },
+            ]
+          },
+          {
+            label: 'Wed 27', tasks: [
+              { tag: 'fs', text: 'Core CRUD — forms, server actions, route handlers' },
+              { tag: 'ag', text: 'First agent endpoint — POST /api/agent/run with SSE streaming' },
+            ]
+          },
+          {
+            label: 'Thu 28', tasks: [
+              { tag: 'fs', text: 'External API integration; error handling; loading states' },
+              { tag: 'ag', text: 'Wire agent endpoint into client component; stream tokens into UI' },
+            ]
+          },
+          {
+            label: 'Fri 29', tasks: [
+              { tag: 'fs', text: 'Env vars, Zod-validated process.env, Sentry free tier' },
+              { tag: 'ag', text: 'Authenticate agent endpoint with Auth.js session; add max_tokens + early-abort caps' },
+            ]
+          },
+          { label: 'Weekend', weekend: true, tasks: [] },
+        ]
+      },
+      {
+        title: 'Week 7 — Build', dates: 'Mon 1 – Fri 5 Jun', miles: '3+ features + solid agent feature; both tested', days: [
+          {
+            label: 'Mon 1', tasks: [
+              { tag: 'fs', text: 'Feature 2' },
+              { tag: 'ag', text: 'Upstash rate limiting; log user + prompt + tool calls + cost per run' },
+            ]
+          },
+          {
+            label: 'Tue 2', tasks: [
+              { tag: 'fs', text: 'Feature 3; think about edge cases' },
+              { tag: 'ag', text: '15 more eval cases for integrated feature; run them' },
+            ]
+          },
+          {
+            label: 'Wed 3', tasks: [
+              { tag: 'fs', text: 'Polish loading/empty/error states' },
+              { tag: 'ag', text: 'Refine system prompt from eval failures; re-run and measure improvement' },
+            ]
+          },
+          {
+            label: 'Thu 4', tasks: [
+              { tag: 'fs', text: 'Lighthouse pass; fix top 3 flags; next/image for images' },
+              { tag: 'ag', text: 'Trace inspection — 3 failed runs; fix or document' },
+            ]
+          },
+          {
+            label: 'Fri 5', tasks: [
+              { tag: 'fs', text: 'DB perf — EXPLAIN on 2–3 queries; add indexes' },
+              { tag: 'ag', text: 'Buffer: catch up on slippage first; then apply parallelisation or evaluator-optimizer to your project, or read aider source' },
+            ]
+          },
+          { label: 'Weekend', weekend: true, tasks: [] },
+        ]
+      },
+      {
+        title: 'Week 8 — Ship It', dates: 'Mon 8 – Fri 12 Jun', miles: 'Deployed, tested, documented project with AI feature. Portfolio ready.', days: [
+          {
+            label: 'Mon 8', tasks: [
+              { tag: 'fs', text: 'Vitest — 10–15 unit tests on business logic (not UI)' },
+              { tag: 'ag', text: 'Make eval report legible — pass/fail counts + cost readable by anyone' },
+            ]
+          },
+          {
+            label: 'Tue 9', tasks: [
+              { tag: 'fs', text: 'Playwright — 2 end-to-end tests on critical flows' },
+              { tag: 'ag', text: 'Add "recent runs" page for logged-in user — great for demos' },
+            ]
+          },
+          {
+            label: 'Wed 10', tasks: [
+              { tag: 'fs', text: 'GitHub Actions CI — tests run on push' },
+              { tag: 'ag', text: 'Write 2–3 paragraph agent design doc for the README' },
+            ]
+          },
+          {
+            label: 'Thu 11', tasks: [
+              { tag: 'fs', text: 'Polished README — screenshots, live demo link, architecture overview' },
+              { tag: 'ag', text: 'Eval results in README; record 2-minute Loom demo video' },
+            ]
+          },
+          {
+            label: 'Fri 12', tasks: [
+              { tag: 'fs', text: 'Ship announcement — post somewhere or tell someone' },
+              { tag: 'ag', text: 'Write up ONE hard-won lesson as blog post or README section' },
+            ]
+          },
+          { label: 'Weekend', weekend: true, tasks: [] },
+        ]
+      },
+    ];
+
+    const TOTAL_TASKS = 108;
+    let state = {};
+    let filter = 'all';
+    let saveTimer = null;
+
+    function tagEl(tag) {
+      const s = document.createElement('span');
+      s.className = 'tag t-' + tag;
+      s.textContent = tag === 'fs' ? 'FS' : tag === 'ag' ? 'AG' : 'PREP';
+      return s;
+    }
+
+    function recount() {
+      let done = 0, daysDone = 0, milesDone = 0;
+      WEEKS.forEach((wk, wi) => {
+        let wkDone = 0, wkTotal = 0;
+        wk.days.forEach((d, di) => {
+          if (d.weekend) return;
+          let allDone = d.tasks.length > 0;
+          d.tasks.forEach((t, ti) => {
+            const k = `${wi}-${di}-${ti}`;
+            if (state[k]) { done++; wkDone++; } else { allDone = false; }
+            wkTotal++;
+          });
+          if (allDone && d.tasks.length > 0) daysDone++;
+        });
+        if (wk.miles && wkDone === wkTotal && wkTotal > 0) milesDone++;
+        const bar = document.getElementById(`bar-${wi}`);
+        const pct = document.getElementById(`pct-${wi}`);
+        if (bar) bar.style.width = (wkTotal > 0 ? Math.round(wkDone / wkTotal * 100) : 0) + '%';
+        if (pct) pct.textContent = (wkTotal > 0 ? Math.round(wkDone / wkTotal * 100) : 0) + '%';
+      });
+      document.getElementById('m-days').textContent = daysDone + '/41';
+      document.getElementById('m-miles').textContent = milesDone + '/8';
+      document.getElementById('m-tasks').textContent = done + '/108';
+      document.getElementById('m-pct').textContent = Math.round(done / TOTAL_TASKS * 100) + '%';
+
+      document.querySelectorAll('.task-row').forEach(row => {
+        const cb = row.querySelector('input[type=checkbox]');
+        const tag = row.dataset.tag;
+        let show = true;
+        if (filter === 'fs') show = tag === 'fs';
+        else if (filter === 'ag') show = tag === 'ag';
+        else if (filter === 'todo') show = cb && !cb.checked;
+        row.style.display = show ? 'flex' : 'none';
+      });
+    }
+
+    function queueSave(key, checked) {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(async () => {
+        const status = document.getElementById('save-status');
+        status.textContent = 'Saving...';
+        try {
+          const { error } = await sb
+            .from('progress')
+            .upsert({ id: key, checked, updated_at: new Date().toISOString() });
+          status.textContent = error ? 'Save failed' : 'Saved';
+        } catch (e) {
+          status.textContent = 'Save failed';
+        }
+      }, 600);
+    }
+
+    function updateDayCard(wi, di, d) {
+      let done = 0;
+      d.tasks.forEach((t, ti) => { if (state[`${wi}-${di}-${ti}`]) done++; });
+      const cnt = document.getElementById(`dcnt-${wi}-${di}`);
+      if (cnt) cnt.textContent = done + '/' + d.tasks.length;
+      const card = document.getElementById(`card-${wi}-${di}`);
+      if (card) card.classList.toggle('all-done', done === d.tasks.length && d.tasks.length > 0);
+    }
+
+    function buildUI() {
+      const root = document.getElementById('weeks-root');
+      root.innerHTML = '';
+
+      WEEKS.forEach((wk, wi) => {
+        const block = document.createElement('div');
+        block.className = 'week-block';
+
+        const hdr = document.createElement('div');
+        hdr.className = 'week-header';
+        hdr.innerHTML = `<span class="week-title">${wk.title}</span><span class="week-dates">${wk.dates}</span><span class="week-pct" id="pct-${wi}">0%</span><span class="chevron" id="chev-${wi}">▼</span>`;
+
+        const bar = document.createElement('div');
+        bar.className = 'prog-bar';
+        const fill = document.createElement('div');
+        fill.className = 'prog-fill';
+        fill.id = `bar-${wi}`;
+        fill.style.width = '0%';
+        bar.appendChild(fill);
+
+        const daysWrap = document.createElement('div');
+        daysWrap.className = 'days-wrap';
+        if (wi === 0) daysWrap.classList.add('open');
+
+        wk.days.forEach((d, di) => {
+          if (d.weekend) {
+            const we = document.createElement('div');
+            we.className = 'weekend';
+            we.textContent = 'Weekend — rest';
+            daysWrap.appendChild(we);
+            return;
+          }
+
+          const card = document.createElement('div');
+          card.className = 'day-card';
+          card.id = `card-${wi}-${di}`;
+
+          const dayHdr = document.createElement('div');
+          dayHdr.className = 'day-header';
+          const preview = d.tasks[0] ? d.tasks[0].text.substring(0, 50) + '…' : '';
+          dayHdr.innerHTML = `<span class="day-label">${d.label}</span><span class="day-summary">${preview}</span><span class="day-count" id="dcnt-${wi}-${di}">0/${d.tasks.length}</span>`;
+
+          const tasksDiv = document.createElement('div');
+          tasksDiv.className = 'day-tasks';
+
+          d.tasks.forEach((t, ti) => {
+            const k = `${wi}-${di}-${ti}`;
+            const row = document.createElement('label');
+            row.className = 'task-row';
+            row.dataset.tag = t.tag;
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.checked = !!state[k];
+            const span = document.createElement('span');
+            span.className = 'task-text' + (state[k] ? ' done' : '');
+            span.appendChild(tagEl(t.tag));
+            span.appendChild(document.createTextNode(t.text));
+            cb.addEventListener('change', () => {
+              state[k] = cb.checked;
+              span.classList.toggle('done', cb.checked);
+              updateDayCard(wi, di, d);
+              recount();
+              queueSave(k, cb.checked);
+            });
+            row.appendChild(cb);
+            row.appendChild(span);
+            tasksDiv.appendChild(row);
+          });
+
+          if (wk.miles) {
+            const nonWeekendDays = wk.days.filter(x => !x.weekend);
+            if (di === wk.days.indexOf(nonWeekendDays[nonWeekendDays.length - 1])) {
+              const ms = document.createElement('div');
+              ms.className = 'milestone';
+              ms.textContent = '\uD83C\uDFC1 ' + wk.miles;
+              tasksDiv.appendChild(ms);
+            }
+          }
+
+          dayHdr.addEventListener('click', () => { tasksDiv.classList.toggle('open'); });
+
+          card.appendChild(dayHdr);
+          card.appendChild(tasksDiv);
+          daysWrap.appendChild(card);
+        });
+
+        hdr.addEventListener('click', () => {
+          const open = daysWrap.classList.toggle('open');
+          document.getElementById(`chev-${wi}`).classList.toggle('open', open);
+        });
+
+        block.appendChild(hdr);
+        block.appendChild(bar);
+        block.appendChild(daysWrap);
+        root.appendChild(block);
+      });
+    }
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        filter = btn.dataset.f;
+        recount();
+      });
+    });
+
+    async function init() {
+      const status = document.getElementById('save-status');
+      status.textContent = 'Connecting...';
+      try {
+        await initSupabase();
+        const { data, error } = await sb.from('progress').select('id, checked');
+        if (!error && data) {
+          data.forEach(row => { state[row.id] = row.checked; });
+        }
+        status.textContent = 'Loaded';
+      } catch (e) {
+        status.textContent = 'Offline — changes won\'t sync';
+      }
+      buildUI();
+      WEEKS.forEach((wk, wi) => {
+        wk.days.forEach((d, di) => { if (!d.weekend) updateDayCard(wi, di, d); });
+      });
+      recount();
+    }
+
+    init();
+  </script>
+</body>
+
+</html>
