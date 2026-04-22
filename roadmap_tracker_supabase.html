@@ -3,21 +3,30 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Roadmap">
+  <meta name="mobile-web-app-capable" content="yes">
   <title>Roadmap Tracker</title>
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
-      padding: 0
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
-      font-family: system-ui, -apple-system, sans-serif;
+      font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
       font-size: 14px;
       background: #fff;
       color: #1a1a1a;
-      padding: 1.5rem
+      padding: 1rem;
+      padding-top: max(1rem, env(safe-area-inset-top));
+      padding-bottom: max(4rem, env(safe-area-inset-bottom));
+      padding-left: max(1rem, env(safe-area-inset-left));
+      padding-right: max(1rem, env(safe-area-inset-right));
     }
 
     .sr-only {
@@ -28,176 +37,185 @@
       overflow: hidden;
       clip: rect(0, 0, 0, 0);
       white-space: nowrap;
-      border: 0
+      border: 0;
     }
 
     .wrap {
       max-width: 780px;
-      margin: 0 auto
+      margin: 0 auto;
     }
 
     h1 {
-      font-size: 18px;
-      font-weight: 500;
-      margin-bottom: .25rem;
-      color: #1a1a1a
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: .2rem;
+      color: #1a1a1a;
+      letter-spacing: -.3px;
     }
 
     .subtitle {
-      font-size: 13px;
+      font-size: 12px;
       color: #888;
-      margin-bottom: 1.25rem
+      margin-bottom: 1.1rem;
     }
 
     .summary {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
-      margin-bottom: 1.25rem
+      gap: 8px;
+      margin-bottom: 1rem;
     }
 
     .metric {
       background: #f5f5f3;
-      border-radius: 8px;
-      padding: .875rem 1rem
+      border-radius: 10px;
+      padding: .75rem .875rem;
     }
 
     .metric-label {
-      font-size: 12px;
+      font-size: 11px;
       color: #888;
-      margin-bottom: 4px
+      margin-bottom: 3px;
     }
 
     .metric-value {
-      font-size: 22px;
-      font-weight: 500;
-      color: #1a1a1a
+      font-size: 20px;
+      font-weight: 600;
+      color: #1a1a1a;
+      letter-spacing: -.5px;
     }
 
     .controls {
       display: flex;
-      gap: 8px;
-      margin-bottom: 1rem;
+      gap: 6px;
+      margin-bottom: .875rem;
       align-items: center;
-      flex-wrap: wrap
+      flex-wrap: wrap;
+      -webkit-overflow-scrolling: touch;
     }
 
     .filter-btn {
       font-size: 12px;
-      padding: 4px 10px;
-      border-radius: 8px;
+      padding: 6px 12px;
+      border-radius: 20px;
       border: 0.5px solid #ccc;
       background: transparent;
       color: #888;
-      cursor: pointer
+      cursor: pointer;
+      min-height: 32px;
+      font-family: inherit;
+      -webkit-appearance: none;
     }
 
     .filter-btn.active {
-      background: #f0f0ee;
-      color: #1a1a1a;
-      border-color: #999
+      background: #1a1a1a;
+      color: #fff;
+      border-color: #1a1a1a;
     }
 
     .save-status {
-      font-size: 12px;
+      font-size: 11px;
       color: #aaa;
-      margin-left: auto
+      margin-left: auto;
     }
 
     .week-block {
-      margin-bottom: .875rem;
+      margin-bottom: .75rem;
       border: 0.5px solid #e0e0e0;
-      border-radius: 12px;
-      overflow: hidden
+      border-radius: 14px;
+      overflow: hidden;
     }
 
     .week-header {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
+      gap: 8px;
+      padding: 11px 14px;
       background: #f5f5f3;
       cursor: pointer;
-      user-select: none
+      user-select: none;
+      min-height: 44px;
     }
 
     .week-title {
       font-size: 13px;
-      font-weight: 500;
+      font-weight: 600;
       color: #1a1a1a;
-      flex: 1
+      flex: 1;
+      letter-spacing: -.2px;
     }
 
     .week-dates {
       font-size: 11px;
-      color: #aaa
+      color: #aaa;
     }
 
     .week-pct {
       font-size: 11px;
-      font-weight: 500;
+      font-weight: 600;
       color: #888;
       min-width: 28px;
-      text-align: right
+      text-align: right;
     }
 
     .chevron {
       font-size: 10px;
       color: #aaa;
-      transition: transform .2s
+      transition: transform .2s;
     }
 
     .chevron.open {
-      transform: rotate(180deg)
+      transform: rotate(180deg);
     }
 
     .prog-bar {
       height: 2px;
-      background: #e8e8e8
+      background: #e8e8e8;
     }
 
     .prog-fill {
       height: 100%;
       background: #1D9E75;
-      transition: width .3s
+      transition: width .3s;
     }
 
     .days-wrap {
       display: none;
-      padding: 10px 12px;
-      gap: 6px;
-      flex-direction: column
+      padding: 8px 10px;
+      gap: 5px;
+      flex-direction: column;
     }
 
     .days-wrap.open {
-      display: flex
+      display: flex;
     }
 
     .day-card {
       border: 0.5px solid #e8e8e8;
-      border-radius: 8px;
-      overflow: hidden
+      border-radius: 10px;
+      overflow: hidden;
     }
 
     .day-card.all-done {
       border-color: transparent;
-      background: #f5f5f3
+      background: #f5f5f3;
     }
 
     .day-header {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 7px 10px;
+      padding: 9px 10px;
       cursor: pointer;
-      background: transparent
+      background: transparent;
+      min-height: 44px;
     }
 
     .day-label {
       font-size: 12px;
-      font-weight: 500;
+      font-weight: 600;
       color: #888;
-      min-width: 52px
+      min-width: 52px;
     }
 
     .day-summary {
@@ -206,100 +224,191 @@
       flex: 1;
       white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis
+      text-overflow: ellipsis;
     }
 
     .day-count {
       font-size: 11px;
-      color: #aaa
+      color: #aaa;
     }
 
     .day-tasks {
       display: none;
-      padding: 6px 10px 8px;
-      gap: 5px;
+      padding: 6px 10px 10px;
+      gap: 0;
       flex-direction: column;
-      border-top: 0.5px solid #e8e8e8
+      border-top: 0.5px solid #e8e8e8;
     }
 
     .day-tasks.open {
-      display: flex
+      display: flex;
     }
 
+    /* Task row — checkbox + text + note */
     .task-row {
       display: flex;
       align-items: flex-start;
       gap: 8px;
-      cursor: pointer
+      padding: 7px 0;
+      border-bottom: 0.5px solid #f0f0f0;
     }
 
-    .task-row input[type=checkbox] {
+    .task-row:last-of-type {
+      border-bottom: none;
+    }
+
+    .task-cb {
       margin-top: 2px;
       accent-color: #1D9E75;
       cursor: pointer;
-      flex-shrink: 0
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+    }
+
+    .task-body {
+      flex: 1;
+      min-width: 0;
     }
 
     .task-text {
       font-size: 12px;
       color: #1a1a1a;
-      line-height: 1.5
+      line-height: 1.5;
+      display: block;
     }
 
     .task-text.done {
       color: #bbb;
-      text-decoration: line-through
+      text-decoration: line-through;
+    }
+
+    /* Note input */
+    .task-note {
+      display: block;
+      margin-top: 4px;
+      width: 100%;
+      max-width: 240px;
+      font-size: 11px;
+      font-family: inherit;
+      color: #555;
+      background: #f7f7f5;
+      border: 0.5px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 3px 7px;
+      height: 26px;
+      outline: none;
+      -webkit-appearance: none;
+      transition: border-color .15s, background .15s;
+    }
+
+    .task-note:focus {
+      border-color: #1D9E75;
+      background: #fff;
+    }
+
+    .task-note::placeholder {
+      color: #bbb;
+    }
+
+    .task-note.has-note {
+      color: #1a1a1a;
+      background: #fff;
+    }
+
+    /* char counter */
+    .note-wrap {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+      max-width: 240px;
+    }
+
+    .note-count {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 9px;
+      color: #ccc;
+      pointer-events: none;
+    }
+
+    .note-count.warn {
+      color: #e67e22;
     }
 
     .tag {
       font-size: 10px;
-      font-weight: 500;
+      font-weight: 600;
       padding: 1px 5px;
-      border-radius: 3px;
+      border-radius: 4px;
       display: inline-block;
       margin-right: 4px;
-      vertical-align: middle
+      vertical-align: middle;
+      letter-spacing: .2px;
     }
 
     .t-fs {
       background: #E6F1FB;
-      color: #0C447C
+      color: #0C447C;
     }
 
     .t-ag {
       background: #E1F5EE;
-      color: #085041
+      color: #085041;
     }
 
     .t-prep {
       background: #FAEEDA;
-      color: #633806
+      color: #633806;
+    }
+
+    .t-ty {
+      background: #F0EAFB;
+      color: #4B1D9E;
     }
 
     .milestone {
       font-size: 11px;
       color: #085041;
       background: #E1F5EE;
-      padding: 5px 8px;
+      padding: 6px 10px;
       border-radius: 8px;
-      margin-top: 4px
+      margin-top: 6px;
     }
 
     .weekend {
       font-size: 12px;
       color: #bbb;
-      padding: 5px 10px;
-      font-style: italic
+      padding: 8px 4px;
+      font-style: italic;
+    }
+
+    /* Scrollable filter row on small screens */
+    @media (max-width: 400px) {
+      .summary {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .controls {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 2px;
+      }
+
+      .filter-btn {
+        flex-shrink: 0;
+      }
     }
   </style>
 </head>
 
 <body>
   <div class="wrap">
-    <h2 class="sr-only">8-week fullstack and agents coding roadmap — interactive progress tracker with 108 tasks</h2>
-    <h1>Roadmap progress tracker</h1>
-    <p class="subtitle">8 weeks + prep day &nbsp;·&nbsp; Mon–Fri &nbsp;·&nbsp; 5h/day &nbsp;·&nbsp; Fri 17 Apr – Fri 12
-      Jun 2026</p>
+    <h2 class="sr-only">8-week fullstack and agents coding roadmap — interactive progress tracker</h2>
+    <h1>Roadmap tracker</h1>
+    <p class="subtitle">8 weeks + prep &nbsp;·&nbsp; Mon–Fri &nbsp;·&nbsp; 5h/day &nbsp;·&nbsp; 17 Apr – 12 Jun 2026</p>
 
     <div class="summary">
       <div class="metric">
@@ -312,7 +421,7 @@
       </div>
       <div class="metric">
         <div class="metric-label">Tasks</div>
-        <div class="metric-value" id="m-tasks">0/108</div>
+        <div class="metric-value" id="m-tasks">0/148</div>
       </div>
       <div class="metric">
         <div class="metric-label">Progress</div>
@@ -322,10 +431,11 @@
 
     <div class="controls">
       <button class="filter-btn active" data-f="all">All</button>
-      <button class="filter-btn" data-f="fs">FS only</button>
-      <button class="filter-btn" data-f="ag">AG only</button>
+      <button class="filter-btn" data-f="fs">FS</button>
+      <button class="filter-btn" data-f="ag">AG</button>
+      <button class="filter-btn" data-f="ty">Typing</button>
       <button class="filter-btn" data-f="todo">Remaining</button>
-      <span class="save-status" id="save-status">Loading...</span>
+      <span class="save-status" id="save-status">Loading…</span>
     </div>
 
     <div id="weeks-root"></div>
@@ -342,6 +452,11 @@
       const { createClient } = supabase;
       sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
+
+    // state: { [key]: { checked: bool, note: string } }
+    let state = {};
+    let filter = 'all';
+    let saveTimers = {};
 
     const WEEKS = [
       {
@@ -381,12 +496,14 @@
             label: 'Thu 23', tasks: [
               { tag: 'fs', text: 'Destructuring, spread, array methods, Map/Set, ES modules' },
               { tag: 'ag', text: 'Read tool use docs; sketch the agent loop on paper' },
+              { tag: 'ty', text: 'keybr 15 min (morning) — home row only, accuracy over speed; never look at hands' },
             ]
           },
           {
             label: 'Fri 24', tasks: [
               { tag: 'fs', text: 'Node + npm project setup; rewrite Wed fetch script as proper npm project' },
               { tag: 'ag', text: 'Implement read_file / write_file / list_dir tools (single-turn, no loop yet)' },
+              { tag: 'ty', text: 'keybr 15 min + Monkeytype time-60 baseline — log your WPM' },
             ]
           },
           { label: 'Weekend', weekend: true, tasks: [] },
@@ -398,30 +515,35 @@
             label: 'Mon 27', tasks: [
               { tag: 'fs', text: 'React: components, JSX, props, useState — components as C structs with render functions' },
               { tag: 'ag', text: 'Implement the full agent loop — iterate until end_turn' },
+              { tag: 'ty', text: 'keybr 15 min — unlock next letter only when accuracy ≥ 95%' },
             ]
           },
           {
             label: 'Tue 28', tasks: [
               { tag: 'fs', text: 'useEffect, events, lists, conditional rendering' },
               { tag: 'ag', text: 'Test agent on "add docstrings to utils.py"; fix what breaks — this is v0' },
+              { tag: 'ty', text: 'keybr 15 min — focus on weakest letter from yesterday' },
             ]
           },
           {
             label: 'Wed 29', tasks: [
               { tag: 'fs', text: 'Build todo app in React + Vite (plain JS) — add, delete, toggle, filter' },
               { tag: 'ag', text: 'Add run_bash (whitelisted, timeout via subprocess); read "Building effective agents" pass 1' },
+              { tag: 'ty', text: 'keybr 15 min + Monkeytype time-60 — log WPM (expect 25–35, that\'s normal)' },
             ]
           },
           {
             label: 'Thu 30', tasks: [
               { tag: 'fs', text: 'Finish todo app; split into multiple components' },
               { tag: 'ag', text: 'Add grep/find tool; sandbox agent to ./workspace' },
+              { tag: 'ty', text: 'keybr 15 min — slow down and exaggerate correct finger if a key feels wrong' },
             ]
           },
           {
             label: 'Fri 1', tasks: [
               { tag: 'fs', text: 'Review React rendering; add one more todo feature' },
               { tag: 'ag', text: 'Structured logging with rich; test agent on a messy Python file' },
+              { tag: 'ty', text: 'keybr 15 min + Monkeytype time-60 — end-of-week WPM log' },
             ]
           },
           { label: 'Weekend', weekend: true, tasks: [] },
@@ -433,30 +555,35 @@
             label: 'Mon 4', tasks: [
               { tag: 'fs', text: 'TS basics, everyday types, narrowing; set up project with strict: true' },
               { tag: 'ag', text: 'Read prompt caching docs; add caching to system prompt + tool definitions' },
+              { tag: 'ty', text: 'keybr 15 min — switch to Monkeytype if keybr feels too slow now' },
             ]
           },
           {
             label: 'Tue 5', tasks: [
               { tag: 'fs', text: 'TS functions, object types; Matt Pocock beginner tutorial' },
               { tag: 'ag', text: 'Measure cost before/after caching on a 20-turn run; write down the savings' },
+              { tag: 'ty', text: 'Monkeytype time-60 ×2 — compare to Day 5 and Day 8 benchmarks' },
             ]
           },
           {
             label: 'Wed 6', tasks: [
               { tag: 'fs', text: 'TS generics, keyof, Partial/Pick/Omit/Record utility types' },
               { tag: 'ag', text: 'Re-read "Building effective agents"; start refactoring agent' },
+              { tag: 'ty', text: 'Monkeytype time-60 — try code mode (Python); note which symbols trip you up' },
             ]
           },
           {
             label: 'Thu 7', tasks: [
               { tag: 'fs', text: 'Discriminated unions, type guards, as const, satisfies' },
               { tag: 'ag', text: 'Finish proper agent — clean prompt, 5–7 tools, sandboxed, logged' },
+              { tag: 'ty', text: 'Monkeytype time-60 — punctuation + numbers on; drill _, {, }, <, >' },
             ]
           },
           {
             label: 'Fri 8', tasks: [
               { tag: 'fs', text: 'Rewrite todo app in TypeScript; type props, events, state' },
               { tag: 'ag', text: 'Test agent on 3 coding tasks; note failures (these become eval cases)' },
+              { tag: 'ty', text: 'Monkeytype time-60 benchmark + log WPM — target ≥ 45 WPM' },
             ]
           },
           { label: 'Weekend', weekend: true, tasks: [] },
@@ -468,30 +595,35 @@
             label: 'Mon 11', tasks: [
               { tag: 'fs', text: 'Next.js learn course — App Router, file conventions (page.tsx, layout.tsx)' },
               { tag: 'ag', text: 'Agent SDK overview + quickstart; install claude-agent-sdk; run bug-fix quickstart' },
+              { tag: 'ty', text: 'Monkeytype time-60 — type your roadmap notes as warm-up; real prose beats random words' },
             ]
           },
           {
             label: 'Tue 12', tasks: [
               { tag: 'fs', text: 'Server vs Client Components ("use client") — the main new mental model; take your time' },
               { tag: 'ag', text: 'Compare hand-rolled vs SDK; note what the SDK gives you for free' },
+              { tag: 'ty', text: 'Monkeytype time-60 — code mode (JavaScript); focus on =>, (), []' },
             ]
           },
           {
             label: 'Wed 13', tasks: [
               { tag: 'fs', text: 'Route handlers, Server Actions, data fetching, dynamic routes' },
               { tag: 'ag', text: 'Read permissions guide; build read-only code reviewer (Read/Glob/Grep only)' },
+              { tag: 'ty', text: 'Monkeytype time-60 — code mode (TypeScript); :, <>, | are the new pain points' },
             ]
           },
           {
             label: 'Thu 14', tasks: [
               { tag: 'fs', text: 'SQL + Postgres review; Neon free tier; Drizzle setup' },
               { tag: 'ag', text: 'MCP intro; install mcp SDK; start a simple MCP server' },
+              { tag: 'ty', text: 'Monkeytype time-60 benchmark + log WPM' },
             ]
           },
           {
             label: 'Fri 15', tasks: [
               { tag: 'fs', text: 'Build notes CRUD in Next.js — Server Components reads, Server Actions writes, Drizzle + Neon' },
               { tag: 'ag', text: 'Finish MCP server with search_my_notes + summarize_commit; wire into agent' },
+              { tag: 'ty', text: 'Monkeytype time-60 — end-of-week benchmark; target ≥ 55 WPM, accuracy ≥ 95%' },
             ]
           },
           { label: 'Weekend', weekend: true, tasks: [] },
@@ -503,24 +635,28 @@
             label: 'Mon 18', tasks: [
               { tag: 'fs', text: 'Tailwind docs; install shadcn/ui' },
               { tag: 'ag', text: 'Read Anthropic eval guidance; design YAML test-case format' },
+              { tag: 'ty', text: 'Monkeytype time-60 — custom word list: Tailwind class names' },
             ]
           },
           {
             label: 'Tue 19', tasks: [
               { tag: 'fs', text: 'Restyle notes app with Tailwind + shadcn — responsive, dark mode' },
               { tag: 'ag', text: 'Build eval harness; 10 test cases running with pass/fail/cost report' },
+              { tag: 'ty', text: 'Monkeytype time-60 — code mode; type out one of your eval YAML files' },
             ]
           },
           {
             label: 'Wed 20', tasks: [
               { tag: 'fs', text: 'Auth.js — sessions, OAuth, password hashing; add signup/login to notes app' },
               { tag: 'ag', text: 'Tracing with JSONL + pretty-printer; instrument agent so any run is replayable' },
+              { tag: 'ty', text: 'Monkeytype time-60 benchmark + log WPM' },
             ]
           },
           {
             label: 'Thu 21', tasks: [
               { tag: 'fs', text: 'Finish auth — users see only own notes; protect server actions + API routes' },
               { tag: 'ag', text: 'Grow evals to 25 cases; fix top 2 failure modes' },
+              { tag: 'ty', text: 'Monkeytype time-60 — numbers on; practice port numbers, token counts, timestamps' },
             ]
           },
           {
@@ -533,6 +669,7 @@
               { tag: 'ag', text: 'Pattern 4 — Orchestrator-workers: small version — orchestrator plans "refactor this module", workers execute' },
               { tag: 'ag', text: 'Pattern 5 — Evaluator-optimizer: generate test suite → score it → regenerate if below threshold (cap 3 iterations)' },
               { tag: 'ag', text: 'Write a one-paragraph personal decision guide: which pattern, when' },
+              { tag: 'ty', text: 'Monkeytype time-60 — halfway WPM log; target ≥ 60 WPM' },
             ]
           },
           { label: 'Weekend', weekend: true, tasks: [] },
@@ -544,6 +681,7 @@
             label: 'Mon 25', tasks: [
               { tag: 'fs', text: 'Scaffold Next.js + Drizzle + Neon; define schema; initial migrations' },
               { tag: 'ag', text: 'Plan agent feature — tools, success criteria, 5 eval cases' },
+              { tag: 'ty', text: 'Monkeytype time-60 — code mode; type your schema definition file' },
             ]
           },
           {
@@ -551,24 +689,28 @@
               { tag: 'fs', text: 'Auth flow, base layout, shadcn components' },
               { tag: 'ag', text: 'Port orchestrator-workers from Day 25 into project context (real tools, real data)' },
               { tag: 'ag', text: 'Decide: does your agent need a routing step? Add one if users can ask qualitatively different things' },
+              { tag: 'ty', text: 'Monkeytype time-60 benchmark + log WPM; target ≥ 65 WPM' },
             ]
           },
           {
             label: 'Wed 27', tasks: [
               { tag: 'fs', text: 'Core CRUD — forms, server actions, route handlers' },
               { tag: 'ag', text: 'First agent endpoint — POST /api/agent/run with SSE streaming' },
+              { tag: 'ty', text: 'Monkeytype time-60 — prose mode; fingers should be automatic on common words now' },
             ]
           },
           {
             label: 'Thu 28', tasks: [
               { tag: 'fs', text: 'External API integration; error handling; loading states' },
               { tag: 'ag', text: 'Wire agent endpoint into client component; stream tokens into UI' },
+              { tag: 'ty', text: 'Monkeytype time-60 — code mode (Python); focus on self, def, return, import' },
             ]
           },
           {
             label: 'Fri 29', tasks: [
               { tag: 'fs', text: 'Env vars, Zod-validated process.env, Sentry free tier' },
               { tag: 'ag', text: 'Authenticate agent endpoint with Auth.js session; add max_tokens + early-abort caps' },
+              { tag: 'ty', text: 'Monkeytype time-60 — end-of-week benchmark; target ≥ 65 WPM' },
             ]
           },
           { label: 'Weekend', weekend: true, tasks: [] },
@@ -580,30 +722,35 @@
             label: 'Mon 1', tasks: [
               { tag: 'fs', text: 'Feature 2' },
               { tag: 'ag', text: 'Upstash rate limiting; log user + prompt + tool calls + cost per run' },
+              { tag: 'ty', text: 'Monkeytype time-60 — code mode; typing should feel automatic for most keys now' },
             ]
           },
           {
             label: 'Tue 2', tasks: [
               { tag: 'fs', text: 'Feature 3; think about edge cases' },
               { tag: 'ag', text: '15 more eval cases for integrated feature; run them' },
+              { tag: 'ty', text: 'Monkeytype time-60 benchmark + log WPM' },
             ]
           },
           {
             label: 'Wed 3', tasks: [
               { tag: 'fs', text: 'Polish loading/empty/error states' },
               { tag: 'ag', text: 'Refine system prompt from eval failures; re-run and measure improvement' },
+              { tag: 'ty', text: 'Monkeytype time-60 — numbers + punctuation on; push accuracy over speed' },
             ]
           },
           {
             label: 'Thu 4', tasks: [
               { tag: 'fs', text: 'Lighthouse pass; fix top 3 flags; next/image for images' },
               { tag: 'ag', text: 'Trace inspection — 3 failed runs; fix or document' },
+              { tag: 'ty', text: 'Monkeytype — custom text: paste a block of your own code and type it back' },
             ]
           },
           {
             label: 'Fri 5', tasks: [
               { tag: 'fs', text: 'DB perf — EXPLAIN on 2–3 queries; add indexes' },
               { tag: 'ag', text: 'Buffer: catch up on slippage first; then apply parallelisation or evaluator-optimizer to your project, or read aider source' },
+              { tag: 'ty', text: 'Monkeytype time-60 — end-of-week benchmark; target ≥ 70 WPM' },
             ]
           },
           { label: 'Weekend', weekend: true, tasks: [] },
@@ -615,30 +762,35 @@
             label: 'Mon 8', tasks: [
               { tag: 'fs', text: 'Vitest — 10–15 unit tests on business logic (not UI)' },
               { tag: 'ag', text: 'Make eval report legible — pass/fail counts + cost readable by anyone' },
+              { tag: 'ty', text: 'Monkeytype time-60 — prose mode; writing the README should feel effortless' },
             ]
           },
           {
             label: 'Tue 9', tasks: [
               { tag: 'fs', text: 'Playwright — 2 end-to-end tests on critical flows' },
               { tag: 'ag', text: 'Add "recent runs" page for logged-in user — great for demos' },
+              { tag: 'ty', text: 'Monkeytype time-60 benchmark + log WPM' },
             ]
           },
           {
             label: 'Wed 10', tasks: [
               { tag: 'fs', text: 'GitHub Actions CI — tests run on push' },
               { tag: 'ag', text: 'Write 2–3 paragraph agent design doc for the README' },
+              { tag: 'ty', text: 'Monkeytype time-60 — code mode; type out your CI workflow YAML' },
             ]
           },
           {
             label: 'Thu 11', tasks: [
               { tag: 'fs', text: 'Polished README — screenshots, live demo link, architecture overview' },
               { tag: 'ag', text: 'Eval results in README; record 2-minute Loom demo video' },
+              { tag: 'ty', text: 'Monkeytype time-60 — final push; aim for a clean personal best run' },
             ]
           },
           {
             label: 'Fri 12', tasks: [
               { tag: 'fs', text: 'Ship announcement — post somewhere or tell someone' },
               { tag: 'ag', text: 'Write up ONE hard-won lesson as blog post or README section' },
+              { tag: 'ty', text: 'Monkeytype time-60 — final benchmark; log vs Day 5 baseline; target ≥ 75 WPM' },
             ]
           },
           { label: 'Weekend', weekend: true, tasks: [] },
@@ -646,15 +798,16 @@
       },
     ];
 
-    const TOTAL_TASKS = 108;
-    let state = {};
-    let filter = 'all';
-    let saveTimer = null;
+    const TOTAL_TASKS = 148;
+
+    function getState(key) {
+      return state[key] || { checked: false, note: '' };
+    }
 
     function tagEl(tag) {
       const s = document.createElement('span');
       s.className = 'tag t-' + tag;
-      s.textContent = tag === 'fs' ? 'FS' : tag === 'ag' ? 'AG' : 'PREP';
+      s.textContent = tag === 'fs' ? 'FS' : tag === 'ag' ? 'AG' : tag === 'ty' ? 'TY' : 'PREP';
       return s;
     }
 
@@ -667,7 +820,7 @@
           let allDone = d.tasks.length > 0;
           d.tasks.forEach((t, ti) => {
             const k = `${wi}-${di}-${ti}`;
-            if (state[k]) { done++; wkDone++; } else { allDone = false; }
+            if (getState(k).checked) { done++; wkDone++; } else { allDone = false; }
             wkTotal++;
           });
           if (allDone && d.tasks.length > 0) daysDone++;
@@ -680,7 +833,7 @@
       });
       document.getElementById('m-days').textContent = daysDone + '/41';
       document.getElementById('m-miles').textContent = milesDone + '/8';
-      document.getElementById('m-tasks').textContent = done + '/108';
+      document.getElementById('m-tasks').textContent = done + '/' + TOTAL_TASKS;
       document.getElementById('m-pct').textContent = Math.round(done / TOTAL_TASKS * 100) + '%';
 
       document.querySelectorAll('.task-row').forEach(row => {
@@ -689,21 +842,29 @@
         let show = true;
         if (filter === 'fs') show = tag === 'fs';
         else if (filter === 'ag') show = tag === 'ag';
+        else if (filter === 'ty') show = tag === 'ty';
         else if (filter === 'todo') show = cb && !cb.checked;
         row.style.display = show ? 'flex' : 'none';
       });
     }
 
-    function queueSave(key, checked) {
-      clearTimeout(saveTimer);
-      saveTimer = setTimeout(async () => {
+    function queueSave(key) {
+      clearTimeout(saveTimers[key]);
+      saveTimers[key] = setTimeout(async () => {
         const status = document.getElementById('save-status');
-        status.textContent = 'Saving...';
+        status.textContent = 'Saving…';
+        const s = getState(key);
         try {
           const { error } = await sb
             .from('progress')
-            .upsert({ id: key, checked, updated_at: new Date().toISOString() });
-          status.textContent = error ? 'Save failed' : 'Saved';
+            .upsert({
+              id: key,
+              checked: s.checked,
+              note: s.note || '',
+              updated_at: new Date().toISOString()
+            });
+          status.textContent = error ? 'Save failed' : 'Saved ✓';
+          setTimeout(() => { status.textContent = ''; }, 2000);
         } catch (e) {
           status.textContent = 'Save failed';
         }
@@ -712,7 +873,7 @@
 
     function updateDayCard(wi, di, d) {
       let done = 0;
-      d.tasks.forEach((t, ti) => { if (state[`${wi}-${di}-${ti}`]) done++; });
+      d.tasks.forEach((t, ti) => { if (getState(`${wi}-${di}-${ti}`).checked) done++; });
       const cnt = document.getElementById(`dcnt-${wi}-${di}`);
       if (cnt) cnt.textContent = done + '/' + d.tasks.length;
       const card = document.getElementById(`card-${wi}-${di}`);
@@ -758,7 +919,7 @@
 
           const dayHdr = document.createElement('div');
           dayHdr.className = 'day-header';
-          const preview = d.tasks[0] ? d.tasks[0].text.substring(0, 50) + '…' : '';
+          const preview = d.tasks[0] ? d.tasks[0].text.substring(0, 48) + '…' : '';
           dayHdr.innerHTML = `<span class="day-label">${d.label}</span><span class="day-summary">${preview}</span><span class="day-count" id="dcnt-${wi}-${di}">0/${d.tasks.length}</span>`;
 
           const tasksDiv = document.createElement('div');
@@ -766,34 +927,95 @@
 
           d.tasks.forEach((t, ti) => {
             const k = `${wi}-${di}-${ti}`;
-            const row = document.createElement('label');
+            const s = getState(k);
+
+            const row = document.createElement('div');
             row.className = 'task-row';
             row.dataset.tag = t.tag;
+
+            // Checkbox
             const cb = document.createElement('input');
             cb.type = 'checkbox';
-            cb.checked = !!state[k];
+            cb.className = 'task-cb';
+            cb.checked = s.checked;
+
+            // Task body (text + note)
+            const body = document.createElement('div');
+            body.className = 'task-body';
+
             const span = document.createElement('span');
-            span.className = 'task-text' + (state[k] ? ' done' : '');
+            span.className = 'task-text' + (s.checked ? ' done' : '');
             span.appendChild(tagEl(t.tag));
             span.appendChild(document.createTextNode(t.text));
+
+            // Note field
+            const noteWrap = document.createElement('div');
+            noteWrap.className = 'note-wrap';
+
+            const noteInput = document.createElement('input');
+            noteInput.type = 'text';
+            noteInput.className = 'task-note' + (s.note ? ' has-note' : '');
+            noteInput.placeholder = 'note…';
+            noteInput.maxLength = 30;
+            noteInput.value = s.note || '';
+            noteInput.setAttribute('autocomplete', 'off');
+            noteInput.setAttribute('autocorrect', 'off');
+            noteInput.setAttribute('autocapitalize', 'off');
+            noteInput.setAttribute('spellcheck', 'false');
+            noteInput.setAttribute('inputmode', 'text');
+
+            const noteCount = document.createElement('span');
+            noteCount.className = 'note-count';
+            noteCount.textContent = s.note ? (30 - s.note.length) : '';
+
+            noteInput.addEventListener('input', () => {
+              const len = noteInput.value.length;
+              const remaining = 30 - len;
+              noteCount.textContent = len > 0 ? remaining : '';
+              noteCount.classList.toggle('warn', remaining <= 5);
+              noteInput.classList.toggle('has-note', len > 0);
+              state[k] = { ...getState(k), note: noteInput.value };
+              queueSave(k);
+            });
+
+            // Stop checkbox toggling when clicking note field
+            noteInput.addEventListener('click', e => e.stopPropagation());
+
+            noteWrap.appendChild(noteInput);
+            noteWrap.appendChild(noteCount);
+
+            body.appendChild(span);
+            body.appendChild(noteWrap);
+
+            // Checkbox change
             cb.addEventListener('change', () => {
-              state[k] = cb.checked;
+              state[k] = { ...getState(k), checked: cb.checked };
               span.classList.toggle('done', cb.checked);
               updateDayCard(wi, di, d);
               recount();
-              queueSave(k, cb.checked);
+              queueSave(k);
             });
+
+            // Tap row (not note) to toggle
+            row.addEventListener('click', (e) => {
+              if (e.target === noteInput || e.target === noteCount) return;
+              if (e.target === cb) return;
+              cb.checked = !cb.checked;
+              cb.dispatchEvent(new Event('change'));
+            });
+
             row.appendChild(cb);
-            row.appendChild(span);
+            row.appendChild(body);
             tasksDiv.appendChild(row);
           });
 
+          // Milestone banner on last non-weekend day
           if (wk.miles) {
             const nonWeekendDays = wk.days.filter(x => !x.weekend);
             if (di === wk.days.indexOf(nonWeekendDays[nonWeekendDays.length - 1])) {
               const ms = document.createElement('div');
               ms.className = 'milestone';
-              ms.textContent = '\uD83C\uDFC1 ' + wk.miles;
+              ms.textContent = '🏁 ' + wk.miles;
               tasksDiv.appendChild(ms);
             }
           }
@@ -828,14 +1050,17 @@
 
     async function init() {
       const status = document.getElementById('save-status');
-      status.textContent = 'Connecting...';
+      status.textContent = 'Connecting…';
       try {
         await initSupabase();
-        const { data, error } = await sb.from('progress').select('id, checked');
+        const { data, error } = await sb.from('progress').select('id, checked, note');
         if (!error && data) {
-          data.forEach(row => { state[row.id] = row.checked; });
+          data.forEach(row => {
+            state[row.id] = { checked: !!row.checked, note: row.note || '' };
+          });
         }
-        status.textContent = 'Loaded';
+        status.textContent = 'Loaded ✓';
+        setTimeout(() => { status.textContent = ''; }, 2000);
       } catch (e) {
         status.textContent = 'Offline — changes won\'t sync';
       }
